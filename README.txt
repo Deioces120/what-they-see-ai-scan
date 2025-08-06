@@ -18,7 +18,7 @@
 
 | Homepage | Scan Result | Threat Detected |
 |---------|--------------|-----------------|
-| ![Screenshot1](https://github.com/Deioces120/what-they-see-ai-scan/blob/main/screenshots/home.png) | ![Screenshot2](screenshots/result.png) | ![Screenshot3](screenshots/threat.png) |
+|👉(https://github.com/Deioces120/what-they-see-ai-scan/tree/main/screenshots) 👈|
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
