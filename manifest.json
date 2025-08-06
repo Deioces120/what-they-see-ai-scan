@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "🔍 What They See - AI Privacy Scanner",
+  "description": "🔍 Analyze what websites track or collect from you using AI. Get actionable suggestions to stay safe online.",
+  "version": "2.0",
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "storage",
+    "cookies",
+    "webRequest"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["*"],
+    "matches": ["<all_urls>"]
+  }]
+}

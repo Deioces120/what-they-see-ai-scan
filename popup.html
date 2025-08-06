@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>🔍 What They See - AI Privacy Scanner</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 400px;
+      min-height: 500px;
+      color: #333;
+      overflow: hidden;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 24px;
+      margin-bottom: 5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+
+    .container {
+      padding: 20px;
+      height: 420px;
+      overflow-y: auto;
+    }
+
+    .scan-button {
+      background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+      border: none;
+      color: white;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+    }
+
+    .scan-button:active {
+      transform: translateY(0);
+    }
+
+    .scan-button.scanning {
+      background: linear-gradient(45deg, #4ecdc4, #44a08d);
+      cursor: not-allowed;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .results {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .result-section {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .result-section:last-child {
+      border-bottom: none;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-content {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #666;
+    }
+
+    .security-score {
+      background: linear-gradient(45deg, #4ecdc4, #44a08d);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .score-number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .score-text {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .warning {
+      background: #ffe6e6;
+      border-left: 4px solid #ff4444;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .safe {
+      background: #e6ffe6;
+      border-left: 4px solid #44ff44;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .info {
+      background: #e6f3ff;
+      border-left: 4px solid #4488ff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .suggestion {
+      background: #fff3e6;
+      border-left: 4px solid #ff8844;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 5px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px 12px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      border-radius: 7px;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .metric:last-child {
+      border-bottom: none;
+    }
+
+    .metric-value {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .url-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      word-break: break-all;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔍 What They See</h1>
+    <p>AI-Powered Privacy Scanner</p>
+  </div>
+
+  <div class="container">
+    <div id="url-info" class="url-info hidden"></div>
+    
+    <button id="scanBtn" class="scan-button">
+      🚀 Start AI Security Scan
+    </button>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p style="color: white;">AI is analyzing the website...</p>
+    </div>
+
+    <div id="tabs" class="tabs hidden">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="security">Security</button>
+      <button class="tab" data-tab="privacy">Privacy</button>
+      <button class="tab" data-tab="threats">Threats</button>
+      <button class="tab" data-tab="ai-analysis">AI Analysis</button>
+    </div>
+
+    <div id="results" class="results">
+      <div id="overview" class="tab-content active">
+        <div id="security-score" class="security-score">
+          <div class="score-number">--</div>
+          <div class="score-text">Security Score</div>
+        </div>
+        <div id="overview-content"></div>
+      </div>
+
+      <div id="security" class="tab-content">
+        <div id="security-content"></div>
+      </div>
+
+      <div id="privacy" class="tab-content">
+        <div id="privacy-content"></div>
+      </div>
+
+      <div id="threats" class="tab-content">
+        <div id="threats-content"></div>
+      </div>
+
+      <div id="ai-analysis" class="tab-content">
+        <div id="ai-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
